@@ -9,7 +9,7 @@ class TextType(Enum):
     LINK = "link"
 
 class TextNode:
-    def __init__(self, text: str, textType, url: str | None = None) -> None:
+    def __init__(self, text: str, textType: TextType, url: t.Optional[str] = None) -> None:
         self.text = text
         self.textType = textType
         self.url = url
@@ -17,7 +17,7 @@ class TextNode:
     def __eq__(self, node: object) -> bool:
         if not isinstance(node, TextNode):
             return False
-        return self == node
+        return self.text == node.text and self.textType == node.textType and self.url == node.url
 
     def __repr__(self):
         return f"TextNode({self.text}, {self.textType}, {self.url})"
