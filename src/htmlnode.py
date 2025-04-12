@@ -85,3 +85,73 @@ class HTMLNode:
                 self.value == value.value and
                 self.props == value.props and
                 self.children == value.children)
+
+                
+class LeafNode(HTMLNode):
+    """
+    A class representing a leaf node in an HTML document.
+    """
+
+    def __init__(self, tag: str, value: str, props: t.Optional[dict] = None) -> None:
+        """
+        Initializes a LeafNode with a tag and attributes.
+
+        :param tag: The HTML tag of the node.
+        :param value: The text content of the node.
+        :param props: A dictionary of attributes for the node.
+        As a leaf node, it does not have children.
+        """
+        super().__init__(tag, value, props)
+        
+    def to_html(self):
+        """
+        Converts the LeafNode to an HTML string representation.
+        :return: The HTML string representation of the node.
+        """
+        
+        if self.value is None:
+            raise ValueError("LeafNode must have a value")
+        if self.tag is None:
+            return self.value
+        opening_tag = f"<{self.tag}"
+        if self.props:
+            props_str = " ".join([f'{key}="{value}"' for key, value in self.props.items()])
+            opening_tag += f" {props_str}"
+        opening_tag += ">"
+        closing_tag = f"</{self.tag}>"
+        return f"{opening_tag}{self.value}{closing_tag}"
+    
+class ParentNode(HTMLNode):
+    """
+    A class representing a parent node in an HTML document.
+    """
+
+    def __init__(self, tag: str, children: list[HTMLNode] = [], props: t.Optional[dict[str, str | int]] = None) -> None:
+        """
+        Initializes a ParentNode with a tag, props, and children.
+
+        :param tag: The HTML tag of the node.
+        :param props: A dictionary of attributes for the node.
+        :param children: A list of child nodes.
+        """
+        super().__init__(tag, None, props, children)
+
+    def to_html(self):
+        """
+        Converts the ParentNode to an HTML string representation.
+
+        :return: The HTML string representation of the node.
+        """
+        if self.tag is None:
+            raise ValueError("ParentNode must have a tag")
+        if not self.children:
+            raise ValueError("ParentNode must have children")
+        opening_tag = f"<{self.tag}"
+
+        if self.props:
+            props_str = " ".join([f'{key}="{value}"' for key, value in self.props.items()])
+            opening_tag += f" {props_str}"
+        opening_tag += ">"
+        closing_tag = f"</{self.tag}>"
+        children_str = "".join(child.to_html() for child in self.children)
+        return f"{opening_tag}{children_str}{closing_tag}"
