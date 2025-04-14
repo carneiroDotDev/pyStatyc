@@ -1,5 +1,6 @@
 
 import typing as t
+from textnode import TextType, TextNode
 
 class HTMLNode:
     """
@@ -32,7 +33,7 @@ class HTMLNode:
         if children is not None and not all(isinstance(child, HTMLNode) for child in children):
             raise ValueError("all children must be HTMLNode instances")
 
-    def to_html(self):
+    def to_html(self) -> str:
         """
         Converts the HTMLNode to an HTML string representation.
 
@@ -54,7 +55,7 @@ class HTMLNode:
         #     children_str = self.value or ""
         # return f"{opening_tag}{children_str}{closing_tag}"
 
-    def props_to_html(self):
+    def props_to_html(self) -> str:
         """
         Converts the props dictionary to an HTML string representation.
 
@@ -92,7 +93,7 @@ class LeafNode(HTMLNode):
     A class representing a leaf node in an HTML document.
     """
 
-    def __init__(self, tag: str, value: str, props: t.Optional[dict] = None) -> None:
+    def __init__(self, tag: t.Optional[str], value: str, props: t.Optional[dict] = None) -> None:
         """
         Initializes a LeafNode with a tag and attributes.
 
@@ -103,7 +104,7 @@ class LeafNode(HTMLNode):
         """
         super().__init__(tag, value, props)
         
-    def to_html(self):
+    def to_html(self) -> str:
         """
         Converts the LeafNode to an HTML string representation.
         :return: The HTML string representation of the node.
@@ -136,7 +137,7 @@ class ParentNode(HTMLNode):
         """
         super().__init__(tag, None, props, children)
 
-    def to_html(self):
+    def to_html(self) -> str:
         """
         Converts the ParentNode to an HTML string representation.
 
@@ -155,3 +156,30 @@ class ParentNode(HTMLNode):
         closing_tag = f"</{self.tag}>"
         children_str = "".join(child.to_html() for child in self.children)
         return f"{opening_tag}{children_str}{closing_tag}"
+
+def text_node_to_html_node(node: TextNode) -> HTMLNode:
+    """
+    Converts a TextNode to an HTMLNode.
+
+    :param node: The TextNode to convert.
+    :return: The converted HTMLNode.
+    """
+    match(node.textType):
+        case TextType.TEXT:
+            return LeafNode(None, node.text)
+        case TextType.BOLD:
+            return LeafNode("b", node.text)
+        case TextType.ITALIC:
+            return LeafNode("i", node.text)
+        case TextType.CODE:
+            return LeafNode("code", node.text)
+        case TextType.IMAGE:
+            if node.url is None:
+                raise ValueError("URL must be provided for IMAGE text type")
+            return LeafNode("img", "", {"src": node.url, "alt": node.text})
+        case TextType.LINK:
+            if node.url is None:
+                raise ValueError("URL must be provided for LINK text type")
+            return LeafNode("a", node.text, {"href": node.url})
+        case _:
+            raise ValueError(f"Unsupported text type: {node.textType}")

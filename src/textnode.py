@@ -3,10 +3,11 @@ import typing as t
 
 class TextType(Enum):
     BOLD = "bold"
-    ITALICS = "italics"
+    ITALIC = "italic"
     CODE = "code"
     IMAGE = "image"
     LINK = "link"
+    TEXT = "text"
 
 class TextNode:
     def __init__(self, text: str, textType: TextType, url: t.Optional[str] = None) -> None:
@@ -29,5 +30,5 @@ class TextNode:
             return False
         return self.text == node.text and self.textType == node.textType and self.url == node.url
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"TextNode({self.text}, {self.textType}, {self.url})"
