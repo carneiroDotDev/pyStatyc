@@ -1,6 +1,9 @@
 from textnode import TextNode, TextType
 
-def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
+
+def split_nodes_delimiter(
+    old_nodes: list[TextNode], delimiter: str, text_type: TextType
+) -> list[TextNode]:
     """
     Splits a list of nodes into two lists based on a delimiter.
 
@@ -12,20 +15,25 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
     """
     for node in old_nodes:
         if delimiter not in node.text:
-            raise Exception(f"Delimiter '{delimiter}' not found in node value '{node.text}'")
-        #if node.textType != TextType.TEXT:
+            raise Exception(
+                f"Delimiter '{delimiter}' not found in node value '{node.text}'"
+            )
+        # if node.textType != TextType.TEXT:
         #    raise Exception(f"Node text type '{node.textType}' for '{node}' is not TEXT")
-    
+
     new_nodes = buildNewNodes(old_nodes, delimiter)
     return new_nodes
-    
-def buildNewNodes(old_nodes: list[TextNode], delimiter: str) -> list[TextNode]:
+
+
+def buildNewNodes(
+    old_nodes: list[TextNode], delimiter: str
+) -> list[TextNode]:
     """
     Helper function to build new nodes based on the delimiter.
     """
     new_nodes = []
     flag = False
-    match(delimiter):
+    match (delimiter):
         case "`":
             for node in old_nodes:
                 nodeTexts = node.text.split(delimiter)
@@ -51,14 +59,16 @@ def buildNewNodes(old_nodes: list[TextNode], delimiter: str) -> list[TextNode]:
                 nodeTexts = node.text.split(delimiter)
                 for text in nodeTexts:
                     if flag:
-                        new_nodes.append(TextNode(text, TextType.ITALIC))
+                        new_nodes.append(
+                            TextNode(text, TextType.ITALIC)
+                        )
                     else:
                         new_nodes.append(TextNode(text, TextType.TEXT))
                     flag = not flag
             return new_nodes
         case _:
             raise Exception(f"Delimiter '{delimiter}' not supported")
-    
+
 
 # node = TextNode("This is text with a `code block` word", TextType.TEXT)
 # new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
